@@ -45,12 +45,14 @@
 
 class SourceModel {
   String? status;
+  String? message;
   List<Sources>? sources;
 
   SourceModel({this.status, this.sources});
 
   SourceModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
+    message = json["message"];
     if (json['sources'] != null) {
       sources = <Sources>[];
       json['sources'].forEach((v) {

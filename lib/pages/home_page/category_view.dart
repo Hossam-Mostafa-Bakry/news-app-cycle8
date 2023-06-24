@@ -1,32 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_cycle8_sat/model/category_model.dart';
+import 'package:news_app_cycle8_sat/pages/home_page/category_view_model.dart';
 import 'package:news_app_cycle8_sat/pages/home_page/tab_bar_list_view.dart';
-import 'package:news_app_cycle8_sat/pages/home_page/widgets/tab_item.dart';
-import 'package:news_app_cycle8_sat/shared_component/network/api_manager.dart';
 
 import '../../model/source_model.dart';
 
-class CategoryView extends StatefulWidget {
-  CategoryModel selected;
+class CategoryView extends StatelessWidget {
+  final CategoryModel selected;
+  var viewModel = CategoryViewModel();
 
   CategoryView({Key? key, required this.selected}) : super(key: key);
 
   @override
-  State<CategoryView> createState() => _CategoryViewState();
-}
-
-class _CategoryViewState extends State<CategoryView> {
-  late Future<SourceModel> fetchSources;
-
-  @override
-  void initState() {
-    fetchSources = ApiManager.fetchSources(widget.selected.id);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SourceModel>(
+    viewModel.loadNewsSourcse(selected.id);
+    return BlocBuilder<CategoryViewModel, CategoryViewState>(
+      bloc: viewModel,
+      builder: (context, state) {
+        if (state is LoadingState) {
+          // show loading
+          return Center(
+            child: Column(
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(),
+                Text(
+                  state.loadingMessage ?? "",
+                ),
+              ],
+            ),
+          );
+        }
+        if (state is ErrorState) {
+          // show error
+          return Column(
+            children: [
+              Text(state.errorMessage ?? ""),
+              IconButton(
+                onPressed: () {
+
+                },
+                icon: const Icon(Icons.refresh_outlined),
+              ),
+            ],
+          );
+        }
+        if (state is SuccessState) {
+          // show result
+          List<Sources> source = state.sources;
+          return TabBarListView(source);
+        }
+        return Container();
+      },
+    );
+    /*return FutureBuilder<SourceModel>(
       future: fetchSources,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -51,6 +79,6 @@ class _CategoryViewState extends State<CategoryView> {
 
         }
       },
-    );
+    );*/
   }
 }

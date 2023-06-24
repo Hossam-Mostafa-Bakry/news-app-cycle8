@@ -5,6 +5,7 @@
 class ArticlModel {
 
   String? status;
+  String? meesage;
   int? totalResults;
   List<Articles>? articles;
 
@@ -16,6 +17,7 @@ class ArticlModel {
 
   ArticlModel.fromJson(dynamic json) {
     status = json['status'];
+    meesage = json["message"];
     totalResults = json['totalResults'];
     if (json['articles'] != null) {
       articles = [];
